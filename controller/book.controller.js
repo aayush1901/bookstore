@@ -1,15 +1,26 @@
 const { db } = require('../db');
 const { booksTable } = require('../models/index');
-const { eq } = require('drizzle-orm');
+const { eq,ilike } = require('drizzle-orm');
+const {sql} = require('drizzle-orm');
 
 exports.getAllBooks= async function(req, res){
+
+    const search = req.query.search;
+    console.log(search);
+    if(search){
+        
+        const books = await db.select().from(booksTable)
+        .where(sql `to_tsvector('english', ${booksTable.title}) @@ to_tsquery('english', ${search})`);
+        return res.json(books);
+    }
     const books = await db.select().from(booksTable);
     return res.json(books);
 }
 
 exports.getBookById = async function(req,res){
     const id = req.params.id;
-    const [ book ]= await db.select().from(booksTable).where(table => eq(table.id,id)).limit(2);
+    const [ book ]= await db.select().from(booksTable)
+    .where(table => eq(table.id,id)).limit(2);
 
     if(!book){
         return res.status(404).json({message : `Book with ${id} not found`});
