@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:17.4
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: Books
+      POSTGRES_USER: aayush
+      POSTGRES_PASSWORD: admin
